@@ -9,6 +9,7 @@ from typing import Optional, Union
 from loguru import logger
 from safetensors.torch import load_file
 import torch
+torch._dynamo.reset()
 from transformers import AutoModel, AutoTokenizer
 
 from config import (
@@ -209,7 +210,7 @@ def load_from_local_dir(
     if compile:
         if verbose:
             logger.info("Compiling DiT and VAE...")
-        transformer = torch.compile(transformer)
+        transformer = torch.compile(transformer, mode='max-autotune', dynamic=True)
         vae = torch.compile(vae)
 
     if verbose:

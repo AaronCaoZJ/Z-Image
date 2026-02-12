@@ -15,13 +15,14 @@ def main():
     model_path = ensure_model_weights("ckpts/Z-Image-Turbo", verify=False)  # True to verify with md5
     dtype = torch.bfloat16
     compile = False  # default False for compatibility
-    output_path = "example.png"
+    output_path = "outputs/8.png"
     height = 1024
     width = 1024
     num_inference_steps = 8
     guidance_scale = 0.0
     seed = 42
-    attn_backend = os.environ.get("ZIMAGE_ATTENTION", "_native_flash")
+    # attn_backend = os.environ.get("ZIMAGE_ATTENTION", "_native_flash")
+    attn_backend = os.environ.get("ZIMAGE_ATTENTION", "flash")
     prompt = (
         "Young Chinese woman in red Hanfu, intricate embroidery. Impeccable makeup, red floral forehead pattern. "
         "Elaborate high bun, golden phoenix headdress, red flowers, beads. Holds round folding fan with lady, trees, bird. "
@@ -35,10 +36,10 @@ def main():
         print("Chosen device: cuda")
     else:
         try:
-            import torch_xla
-            import torch_xla.core.xla_model as xm
+            # import torch_xla
+            # import torch_xla.core.xla_model as xm
 
-            device = xm.xla_device()
+            # device = xm.xla_device()
             print("Chosen device: tpu")
         except (ImportError, RuntimeError):
             if torch.backends.mps.is_available():
