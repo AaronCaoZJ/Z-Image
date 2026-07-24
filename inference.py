@@ -16,13 +16,13 @@ def main():
     dtype = torch.bfloat16
     compile = False  # default False for compatibility
     output_path = "outputs/8.png"
-    height = 1024
-    width = 1024
+    height = 512
+    width = 512
     num_inference_steps = 8
     guidance_scale = 0.0
     seed = 42
-    # attn_backend = os.environ.get("ZIMAGE_ATTENTION", "_native_flash")
-    attn_backend = os.environ.get("ZIMAGE_ATTENTION", "flash")
+    attn_backend = os.environ.get("ZIMAGE_ATTENTION", "_native_flash")
+    # attn_backend = os.environ.get("ZIMAGE_ATTENTION", "flash")
     prompt = (
         "Young Chinese woman in red Hanfu, intricate embroidery. Impeccable makeup, red floral forehead pattern. "
         "Elaborate high bun, golden phoenix headdress, red flowers, beads. Holds round folding fan with lady, trees, bird. "
@@ -36,10 +36,8 @@ def main():
         print("Chosen device: cuda")
     else:
         try:
-            # import torch_xla
-            # import torch_xla.core.xla_model as xm
-
-            # device = xm.xla_device()
+            import torch_xla.core.xla_model as xm
+            device = xm.xla_device()
             print("Chosen device: tpu")
         except (ImportError, RuntimeError):
             if torch.backends.mps.is_available():
@@ -67,6 +65,7 @@ def main():
     )
     end_time = time.time()
     print(f"Time taken: {end_time - start_time:.2f} seconds")
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     images[0].save(output_path)
 
     ### !! For best speed performance, recommend to use `_flash_3` backend and set `compile=True`
